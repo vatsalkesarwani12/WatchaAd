@@ -1,8 +1,5 @@
 package com.example.watchaad
 
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
 import android.widget.Button
 import android.widget.TextView
 
@@ -11,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.*
 
 // Remove the line below after defining your own ad unit ID.
 private const val TOAST_TEXT = "Test ads are being shown. " +
@@ -25,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private var interstitialAd: InterstitialAd? = null
     private lateinit var nextLevelButton: Button
     private lateinit var levelTextView: TextView
+    lateinit var mAdView : AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         // Create the next level button, which tries to show an interstitial when clicked.
         nextLevelButton = findViewById(R.id.next_level_button)
+        mAdView = findViewById(R.id.adViewBanner)
         nextLevelButton.isEnabled = false
         nextLevelButton.setOnClickListener { showInterstitial() }
 
@@ -94,10 +93,14 @@ class MainActivity : AppCompatActivity() {
     private fun loadInterstitial() {
         // Disable the next level button and load the ad.
         nextLevelButton.isEnabled = false
-        val adRequest = AdRequest.Builder()
+        val adRequestInterstitial = AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template")
                 .build()
-        interstitialAd?.loadAd(adRequest)
+        interstitialAd?.loadAd(adRequestInterstitial)
+
+        //banner ad.
+        val adRequestBanner = AdRequest.Builder().build()
+        mAdView.loadAd(adRequestBanner)
     }
 
     private fun goToNextLevel() {
