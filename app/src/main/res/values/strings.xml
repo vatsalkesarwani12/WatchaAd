@@ -11,4 +11,5 @@
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
     <string name="interstitial_ad_unit_id">ca-app-pub-4528420242999185/7975148625</string>
+    <string name="open_reward_ad">Open reward ad</string>
 </resources>

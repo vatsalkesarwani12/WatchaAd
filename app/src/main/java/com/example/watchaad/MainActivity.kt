@@ -8,7 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.NonNull
 import com.google.android.gms.ads.*
+import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdCallback
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 // Remove the line below after defining your own ad unit ID.
 private const val TOAST_TEXT = "Test ads are being shown. " +
@@ -23,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextLevelButton: Button
     private lateinit var levelTextView: TextView
     lateinit var mAdView : AdView
+    private lateinit var rewardedAd: RewardedAd
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +49,14 @@ class MainActivity : AppCompatActivity() {
         // Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).
         interstitialAd = newInterstitialAd()
         loadInterstitial()
+
+        rewardedAd = RewardedAd(this, "ca-app-pub-4528420242999185/2195180667")
+        createAndLoadRewardedAd()
+
+        findViewById<Button>(R.id.reward_button).setOnClickListener{
+            rewardsCallback()
+        }
+
 
         // Toasts the test ad message on the screen. Remove this after defining your own ad unit ID.
        // Toast.makeText(this, TOAST_TEXT, Toast.LENGTH_LONG).show()
@@ -108,5 +122,45 @@ class MainActivity : AppCompatActivity() {
         levelTextView.text = "Level " + (++currentLevel)
         interstitialAd = newInterstitialAd()
         loadInterstitial()
+    }
+
+    private fun createAndLoadRewardedAd(): RewardedAd {
+        val adLoadCallback = object: RewardedAdLoadCallback() {
+            override fun onRewardedAdLoaded() {
+                // Ad successfully loaded.
+            }
+            override fun onRewardedAdFailedToLoad(adError: LoadAdError) {
+                // Ad failed to load.
+            }
+        }
+        rewardedAd.loadAd(AdRequest.Builder().build(), adLoadCallback)
+        return rewardedAd
+    }
+
+    private fun rewardsCallback() {
+        if(rewardedAd.isLoaded) {
+            val adLoadCallback = object : RewardedAdCallback() {
+                override fun onRewardedAdOpened() {
+                    // Ad opened.
+                }
+
+                override fun onRewardedAdClosed() {
+                    Toast.makeText(this@MainActivity, "ad closed", Toast.LENGTH_LONG).show()
+                    rewardedAd = createAndLoadRewardedAd()
+                }
+
+                override fun onUserEarnedReward(@NonNull reward: RewardItem) {
+                    Toast.makeText(this@MainActivity, ""+reward.amount, Toast.LENGTH_LONG).show()
+                }
+
+                override fun onRewardedAdFailedToShow(adError: AdError) {
+                    Toast.makeText(this@MainActivity, ""+adError.message, Toast.LENGTH_LONG).show()
+                }
+
+            }
+            rewardedAd.show(this, adLoadCallback)
+        }else {
+            Toast.makeText(this, "reward ad failed to load ", Toast.LENGTH_LONG).show()
+        }
     }
 }
